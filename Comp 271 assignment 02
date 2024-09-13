@@ -1,0 +1,151 @@
+/**
+ * A simple class to demonstrate dynamic behavior with arrays. Objects of this
+ * class store strings in an array that grows to match the demand for storage.
+ * 
+ * The class is based on an underlying string array. Objects can be initialized
+ * to any size; otherwise they'll be initialized to the default size. For
+ * example,
+ * 
+ * DynamicArray da1 = new DynamicArray(10);
+ * 
+ * will have initially room for 10 strings, while
+ * 
+ * DynamicArray da2 = new DynamicArray();
+ * 
+ * will have initially room for 4 strings.
+ */
+public class DynamicArray {
+
+    /** Default size for underlying array */
+    private static final int DEFAULT_SIZE = 4;
+
+    /** The underlying array for this class */
+    private String[] foundation;
+
+    /** Number of elements currently stored */
+    private int count;
+
+    /** Full constructor. Initializes the underlying array to the specified size. The
+     * size must be a positive, non-zero value. Otherwise the constructor uses the
+     * default size value.
+     */
+    public DynamicArray(int size) {
+        size = (size > 0) ? size : DEFAULT_SIZE;
+        this.foundation = new String[size];
+        this.count = 0;
+    } // full constructor
+
+    /** Array-based constructor -- used for testing */
+    public DynamicArray(String[] data) {
+        if (data != null) {
+            this.foundation = data;
+            this.count = data.length;
+        } else {
+            this.foundation = new String[DEFAULT_SIZE];
+            this.count = 0;
+        }
+    } // array-based constructor
+
+    /** Default constructor */
+    public DynamicArray() {
+        this(DEFAULT_SIZE);
+    } // default constructor
+
+    /** Driver/test code */
+    public static void main(String[] args) {
+        final String PASS = "Pass";
+        final String FAIL = "Fail";
+        final String NON_EXISTING = "COBOL";
+        
+        // Test data
+        String[] testData = { "Java", "Python", null, "C++", "Fortran" };
+        DynamicArray test = new DynamicArray(testData);
+        DynamicArray tset = new DynamicArray(null); // handled null data
+
+        // Testing null handling
+        String testContainsNull = (test.contains(null)) ? PASS : FAIL; // should pass if null is present
+        System.out.printf("\nTest for contains(null): ............... %s", testContainsNull);
+        
+        // Other tests for contains, get, remove, etc.
+        String testContainsExisting = (test.contains(testData[1])) ? PASS : FAIL;
+        String testContainsNonExisting = (!test.contains(NON_EXISTING)) ? PASS : FAIL;
+        String testGetNegative = (test.get(-1) == null) ? PASS : FAIL;
+        String testGet = (test.get(0).equals(testData[0])) ? PASS : FAIL;
+        String testGetOutOfBounds = (test.get(testData.length + 1) == null) ? PASS : FAIL;
+        String testRemove = (testData[1].equals(test.remove(1))) ? PASS : FAIL;
+        String testRemoveNull = (test.remove(1) == null) ? PASS : FAIL;
+        String testRemoveOutOfBounds = (test.remove(testData.length + 1) == null) ? PASS : FAIL;
+        System.out.printf("\nTest for contains(existing): ........... %s", testContainsExisting);
+        System.out.printf("\nTest for contains(non-existing): ....... %s", testContainsNonExisting);
+        System.out.printf("\nTest for get(-1): ...................... %s", testGetNegative);
+        System.out.printf("\nTest for get(0): ....................... %s", testGet);
+        System.out.printf("\nTest for get(out of bounds): ........... %s\n", testGetOutOfBounds);
+        System.out.printf("\nTest for remove(1): .................... %s", testRemove);
+        System.out.printf("\nTest for remove(null): ................. %s", testRemoveNull);
+        System.out.printf("\nTest for remove(out of bounds): ........ %s\n\n", testRemoveOutOfBounds);
+        
+        // If all is good, these two statements will not crash the program
+        test.insert("Pascal");
+        test.insert("Basic");
+    } // method main
+
+    // Method to check if the array contains the target string, including null
+    public boolean contains(String target) {
+        for (String s : foundation) {
+            if (s == null && target == null) {
+                return true; // null target matches null element
+            }
+            if (s != null && s.equals(target)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Method to get the string at a particular index
+    public String get(int index) {
+        if (index < 0 || index >= foundation.length) {
+            return null;
+        }
+        return foundation[index];
+    }
+
+    // Method to remove the string at a particular index and return it
+    public String remove(int index) {
+        if (index < 0 || index >= count) {
+            return null;
+        }
+        String removed = foundation[index];
+        for (int i = index; i < count - 1; i++) {
+            foundation[i] = foundation[i + 1];
+        }
+        foundation[count - 1] = null;
+        count--;
+        return removed;
+    }
+
+    // Method to delete the string at a particular index
+    public void delete(int index) {
+        remove(index);
+    }
+
+    // Method to insert a string, resizing the array if necessary
+    public void insert(String string) {
+        if (string == null) return;
+        if (count == foundation.length) {
+            resize();
+        }
+        foundation[count] = string;
+        count++;
+    }
+
+    // Method to resize the array when it becomes full
+    private void resize() {
+        String[] newFoundation = new String[foundation.length * 2];
+        for (int i = 0; i < foundation.length; i++) {
+            newFoundation[i] = foundation[i];
+        }
+        foundation = newFoundation;
+    }
+
+} // class DynamicArray
